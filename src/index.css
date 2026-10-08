@@ -1,27 +1,50 @@
 @import "tailwindcss";
 
 @layer base {
+  :root {
+    --font-heading: 'Montserrat', system-ui, -apple-system, sans-serif;
+    --font-body: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+  }
+
   body {
-    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    font-family: var(--font-body);
+    letter-spacing: -0.012em;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
   
-  h1, h2, h3, .font-display {
-    font-family: 'Syne', 'Plus Jakarta Sans', system-ui, sans-serif;
+  h1, h2, h3, h4, h5, h6, .font-display {
+    font-family: var(--font-heading);
+    letter-spacing: -0.025em;
   }
+
+  .font-mono {
+    font-family: var(--font-mono);
+  }
+}
+
+/* Hide scrollbar for clean horizontal tab sliders */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 
 /* Custom scrollbars */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #0B0F17;
+  background: #080B11;
 }
 ::-webkit-scrollbar-thumb {
-  background: #222938;
+  background: #1E2638;
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #374151;
+  background: #2D3748;
 }

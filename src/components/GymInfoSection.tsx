@@ -30,13 +30,13 @@ export const GymInfoSection: React.FC<GymInfoSectionProps> = ({ config }) => {
   ];
 
   return (
-    <section id="gimnasio" className="py-16 md:py-24 bg-[#0A0D14] border-t border-slate-800/80">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
+    <section id="gimnasio" className="py-12 sm:py-16 md:py-24 bg-[#080B11] border-t border-slate-800/80">
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 sm:gap-10 items-start">
           {/* Left Column: DOMINUS GYM Location & Facility Card */}
-          <div className="lg:col-span-5 space-y-6">
-            <div className="flex items-start gap-4">
-              <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-slate-950 border-2 border-amber-500/40 p-1.5 shadow-xl shrink-0 overflow-hidden flex items-center justify-center">
+          <div className="lg:col-span-5 space-y-5 sm:space-y-6">
+            <div className="flex items-start gap-3.5 sm:gap-4">
+              <div className="w-14 h-14 sm:w-20 sm:h-20 rounded-2xl bg-slate-950 border-2 border-amber-500/40 p-1.5 shadow-xl shrink-0 overflow-hidden flex items-center justify-center">
                 <img
                   src={gymLogo}
                   alt="DOMINUS GYM Logo"
@@ -47,7 +47,7 @@ export const GymInfoSection: React.FC<GymInfoSectionProps> = ({ config }) => {
                 <div className="text-xs font-bold text-amber-400 uppercase tracking-widest mb-1">
                   Sede Central Oficial
                 </div>
-                <h2 className="font-display text-2xl sm:text-3xl font-extrabold text-white">
+                <h2 className="font-display text-2xl sm:text-3xl font-black text-white">
                   DOMINUS GYM
                 </h2>
                 <p className="text-xs sm:text-sm text-slate-400 mt-1 leading-relaxed">

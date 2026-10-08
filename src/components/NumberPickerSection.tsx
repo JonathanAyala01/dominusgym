@@ -421,75 +421,56 @@ export const NumberPickerSection: React.FC<NumberPickerSectionProps> = ({
 
         {/* Selected numbers summary & Floating purchase bar */}
         {selectedNumbers.length > 0 && (
-          <div className="fixed bottom-0 left-0 right-0 z-50 p-4 bg-[#0B0F17]/95 backdrop-blur-xl border-t border-slate-800 shadow-2xl transition-all animate-in slide-in-from-bottom-4">
-            <div className="max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-              <div className="flex items-center gap-3 w-full sm:w-auto">
-                <div className="w-10 h-10 rounded-xl bg-amber-400/10 border border-amber-400/30 flex items-center justify-center text-amber-400 shrink-0">
-                  <ShoppingBag className="w-5 h-5" />
+          <div className="fixed bottom-0 left-0 right-0 z-50 px-3 py-2.5 sm:px-6 sm:py-3.5 bg-[#080B11]/95 backdrop-blur-xl border-t border-slate-800 shadow-2xl transition-all animate-in slide-in-from-bottom-3">
+            <div className="max-w-4xl mx-auto flex items-center justify-between gap-3">
+              {/* Left: Count & Selected Badges */}
+              <div className="flex items-center gap-2.5 min-w-0">
+                <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-amber-400/15 border border-amber-400/30 flex items-center justify-center text-amber-400 shrink-0">
+                  <ShoppingBag className="w-4 h-4 sm:w-5 sm:h-5" />
                 </div>
                 <div className="min-w-0">
                   <div className="flex items-center gap-2">
-                    <span className="text-sm font-bold text-white">
-                      {selectedNumbers.length} {selectedNumbers.length === 1 ? 'número' : 'números'}
+                    <span className="text-xs sm:text-sm font-bold text-white whitespace-nowrap">
+                      {selectedNumbers.length} {selectedNumbers.length === 1 ? 'núm.' : 'núms.'}
+                    </span>
+                    <span className="text-sm sm:text-lg font-display font-black text-amber-400 tabular-nums">
+                      {formatARS(pricing.total)}
                     </span>
                     {pricing.badge && (
-                      <span className="text-[10px] bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded font-semibold border border-emerald-500/30">
+                      <span className="hidden sm:inline-block text-[10px] bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded font-bold border border-emerald-500/30">
                         {pricing.badge}
                       </span>
                     )}
                   </div>
-                  <div className="flex items-center gap-1.5 flex-wrap overflow-hidden max-h-6">
-                    {selectedNumbers.slice(0, 8).map((num) => (
-                      <span
-                        key={num}
-                        className="text-xs font-mono font-bold text-amber-400 bg-slate-900 px-1.5 py-0.5 rounded border border-slate-800"
-                      >
-                        {num.toString().padStart(2, '0')}
-                      </span>
-                    ))}
-                    {selectedNumbers.length > 8 && (
-                      <span className="text-xs text-slate-400">
-                        +{selectedNumbers.length - 8} más
-                      </span>
-                    )}
+                  <div className="text-[10px] sm:text-xs text-slate-400 truncate">
+                    {pricing.discount > 0 ? (
+                      <span className="text-emerald-400 font-semibold sm:hidden">{pricing.badge} · </span>
+                    ) : null}
+                    <span className="font-mono text-slate-400">
+                      [{selectedNumbers.slice(0, 5).map((num) => num.toString().padStart(2, '0')).join(', ')}
+                      {selectedNumbers.length > 5 ? '…' : ''}]
+                    </span>
                   </div>
                 </div>
               </div>
 
-              <div className="flex items-center justify-between sm:justify-end gap-4 w-full sm:w-auto">
-                <div className="text-right">
-                  <div className="text-xs text-slate-400">Total a pagar:</div>
-                  <div className="text-lg sm:text-xl font-display font-extrabold text-amber-400 tabular-nums">
-                    {formatARS(pricing.total)}
-                  </div>
-                  {pricing.discount > 0 ? (
-                    <div className="text-[10px] text-emerald-400 line-through">
-                      {formatARS(pricing.originalTotal)}
-                    </div>
-                  ) : (
-                    <div className="text-[10px] text-slate-400 hidden sm:block">
-                      MP · CBU · En el Gym
-                    </div>
-                  )}
-                </div>
+              {/* Right: Actions */}
+              <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+                <button
+                  onClick={onClearSelection}
+                  title="Limpiar selección"
+                  className="p-2 sm:p-2.5 text-slate-400 hover:text-white hover:bg-slate-800 rounded-xl border border-slate-800 transition-colors cursor-pointer"
+                >
+                  <X className="w-4 h-4" />
+                </button>
 
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={onClearSelection}
-                    title="Limpiar selección"
-                    className="p-2.5 text-slate-400 hover:text-white hover:bg-slate-800 rounded-xl border border-slate-800 transition-colors cursor-pointer"
-                  >
-                    <X className="w-4 h-4" />
-                  </button>
-
-                  <button
-                    onClick={onOpenCheckout}
-                    className="px-6 py-3 bg-amber-400 hover:bg-amber-300 text-slate-950 font-bold rounded-xl shadow-lg shadow-amber-400/20 transition-all flex items-center gap-2 text-sm cursor-pointer whitespace-nowrap active:scale-95"
-                  >
-                    <span>Continuar al Pago</span>
-                    <ArrowRight className="w-4 h-4" />
-                  </button>
-                </div>
+                <button
+                  onClick={onOpenCheckout}
+                  className="px-4 py-2 sm:px-6 sm:py-2.5 bg-amber-400 hover:bg-amber-300 text-slate-950 font-black rounded-xl shadow-lg shadow-amber-400/20 transition-all flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm cursor-pointer whitespace-nowrap active:scale-95"
+                >
+                  <span>Continuar</span>
+                  <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                </button>
               </div>
             </div>
           </div>

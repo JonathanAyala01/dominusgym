@@ -10,9 +10,9 @@ interface FooterProps {
 
 export const Footer: React.FC<FooterProps> = ({ config, onOpenAdmin }) => {
   return (
-    <footer className="bg-[#070A0F] border-t border-slate-900 py-12 text-slate-400 text-xs">
+    <footer className="bg-[#05080E] border-t border-slate-900 py-10 sm:py-12 text-slate-400 text-xs">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col md:flex-row items-center justify-between gap-6 pb-8 border-b border-slate-900">
+        <div className="flex flex-col md:flex-row items-center justify-between gap-6 pb-6 sm:pb-8 border-b border-slate-900 text-center md:text-left">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-slate-950 border border-amber-500/40 p-1 overflow-hidden flex items-center justify-center shrink-0">
               <img
@@ -22,7 +22,7 @@ export const Footer: React.FC<FooterProps> = ({ config, onOpenAdmin }) => {
               />
             </div>
             <div>
-              <span className="font-display font-bold text-white text-base">
+              <span className="font-display font-black text-white text-base">
                 DOMINUS <span className="text-amber-400">GYM</span>
               </span>
               <span className="text-[11px] text-slate-400 block -mt-0.5">
@@ -31,7 +31,7 @@ export const Footer: React.FC<FooterProps> = ({ config, onOpenAdmin }) => {
             </div>
           </div>
 
-          <div className="flex flex-wrap items-center justify-center gap-6 text-xs text-slate-400 font-medium">
+          <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 text-xs text-slate-400 font-semibold">
             <a href="#sorteo" className="hover:text-amber-400 transition-colors">
               Inicio
             </a>
@@ -43,19 +43,19 @@ export const Footer: React.FC<FooterProps> = ({ config, onOpenAdmin }) => {
             </a>
             <button
               onClick={onOpenAdmin}
-              className="text-slate-400 hover:text-slate-200 transition-colors cursor-pointer text-xs"
+              className="text-amber-400/90 hover:text-amber-300 transition-colors cursor-pointer text-xs font-bold"
             >
               Acceso Admin
             </button>
           </div>
         </div>
 
-        <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] text-slate-400">
+        <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-[11px] text-slate-400 text-center sm:text-left">
           <div>
             © {new Date().getFullYear()} DOMINUS GYM. Todos los derechos reservados.
           </div>
           <div className="text-center sm:text-right text-slate-400">
-            Rifa oficial y bono contribución para equipamiento e instalaciones deportivas.
+            Rifa oficial y bono contribución para equipamiento deportivo.
           </div>
         </div>
       </div>

@@ -54,11 +54,11 @@ export const VerificationModal: React.FC<VerificationModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md overflow-y-auto">
-      <div className="relative w-full max-w-lg bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl overflow-hidden my-8">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/85 backdrop-blur-md overflow-y-auto">
+      <div className="relative w-full max-w-lg bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl overflow-hidden my-auto max-h-[94vh] flex flex-col">
         {/* Header */}
-        <div className="px-6 py-4 bg-slate-950/70 border-b border-slate-800 flex items-center justify-between">
-          <div className="flex items-center gap-3">
+        <div className="px-4 sm:px-6 py-3.5 sm:py-4 bg-slate-950/80 border-b border-slate-800 flex items-center justify-between shrink-0">
+          <div className="flex items-center gap-2.5 sm:gap-3">
             <div className="w-8 h-8 rounded-lg bg-slate-950 border border-amber-500/40 p-0.5 overflow-hidden flex items-center justify-center shrink-0">
               <img
                 src={gymLogo}
@@ -66,7 +66,7 @@ export const VerificationModal: React.FC<VerificationModalProps> = ({
                 className="w-full h-full object-contain rounded"
               />
             </div>
-            <span className="font-display font-bold text-white text-base">
+            <span className="font-display font-black text-white text-sm sm:text-base">
               Consultar y Verificar mis Números
             </span>
           </div>
@@ -78,7 +78,7 @@ export const VerificationModal: React.FC<VerificationModalProps> = ({
           </button>
         </div>
 
-        <div className="p-6 space-y-6">
+        <div className="p-4 sm:p-6 space-y-5 overflow-y-auto flex-1">
           <p className="text-xs sm:text-sm text-slate-300">
             Ingresá tu número de teléfono celular / WhatsApp, DNI o tu nombre para chequear los números que tenés asignados en el sorteo de DOMINUS GYM.
           </p>

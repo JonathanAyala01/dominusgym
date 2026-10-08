@@ -727,12 +727,12 @@ SET FOREIGN_KEY_CHECKS = 1;
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/90 backdrop-blur-md overflow-y-auto">
-      <div className="relative w-full max-w-5xl bg-[#0D111A] border border-slate-800 rounded-3xl shadow-2xl overflow-hidden my-4 sm:my-8 flex flex-col max-h-[92vh]">
-        {/* Header */}
-        <div className="px-6 py-4 bg-slate-950/90 border-b border-slate-800 flex items-center justify-between shrink-0">
+    <div className="fixed inset-0 z-50 flex flex-col bg-[#070A0F] text-slate-100 overflow-hidden animate-in fade-in duration-200">
+      <div className="relative w-full h-full flex flex-col bg-[#070A0F] overflow-hidden">
+        {/* Header - Expansive Full Width */}
+        <div className="px-4 sm:px-8 py-3.5 bg-slate-950/95 border-b border-slate-800/80 flex items-center justify-between shrink-0">
           <div className="flex items-center gap-3">
-            <div className="w-11 h-11 rounded-xl bg-slate-950 border border-amber-500/40 p-1 flex items-center justify-center shrink-0 overflow-hidden shadow-md">
+            <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-slate-950 border border-amber-500/40 p-1 flex items-center justify-center shrink-0 overflow-hidden shadow-md">
               <img
                 src={gymLogo}
                 alt="DOMINUS GYM"
@@ -741,20 +741,20 @@ SET FOREIGN_KEY_CHECKS = 1;
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="font-display font-extrabold text-white text-base sm:text-lg">
+                <span className="font-display font-extrabold text-white text-base sm:text-lg tracking-tight">
                   Panel de Control DOMINUS GYM
                 </span>
                 <span className="text-[10px] font-bold text-amber-400 bg-amber-400/10 px-2 py-0.5 rounded border border-amber-400/20">
                   ADMIN
                 </span>
               </div>
-              <span className="text-xs text-slate-400">
+              <span className="text-xs text-slate-400 hidden sm:inline">
                 Gestión Oficial de Rifa · Sorteo Fiat Mobi 2017
               </span>
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 sm:gap-3">
             <button
               onClick={handleLogout}
               title="Cerrar sesión de administrador"
@@ -766,16 +766,17 @@ SET FOREIGN_KEY_CHECKS = 1;
 
             <button
               onClick={onClose}
-              className="p-2 text-slate-400 hover:text-white rounded-xl hover:bg-slate-800 transition-colors cursor-pointer"
-              title="Cerrar panel"
+              className="p-2 text-slate-400 hover:text-white rounded-xl hover:bg-slate-800 border border-slate-800/80 transition-colors cursor-pointer flex items-center gap-1 text-xs font-semibold"
+              title="Cerrar panel y volver a la web"
             >
               <X className="w-5 h-5" />
+              <span className="hidden md:inline">Volver</span>
             </button>
           </div>
         </div>
 
-        {/* Tab Navigation */}
-        <div className="flex border-b border-slate-800 bg-slate-950/60 px-4 sm:px-6 gap-2 sm:gap-6 text-xs font-bold overflow-x-auto shrink-0">
+        {/* Tab Navigation - Expansive with smooth touch scroll */}
+        <div className="flex border-b border-slate-800 bg-slate-950/70 px-4 sm:px-8 gap-2 sm:gap-6 text-xs font-bold overflow-x-auto shrink-0 no-scrollbar">
           <button
             onClick={() => setActiveTab('overview')}
             className={`py-3.5 border-b-2 cursor-pointer transition-colors whitespace-nowrap ${
@@ -879,8 +880,8 @@ SET FOREIGN_KEY_CHECKS = 1;
           </button>
         </div>
 
-        {/* Tab Body */}
-        <div className="p-4 sm:p-6 overflow-y-auto flex-1 space-y-6">
+        {/* Tab Body - Expansive Full Width & Responsive */}
+        <div className="p-3 sm:p-6 lg:p-8 overflow-y-auto flex-1 space-y-6 w-full max-w-[1920px] mx-auto">
           {/* TAB 1: RESUMEN GENERAL */}
           {activeTab === 'overview' && (
             <div className="space-y-6">

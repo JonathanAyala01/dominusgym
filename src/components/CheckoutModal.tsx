@@ -109,11 +109,11 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
   const whatsappUrl = `https://wa.me/${config.whatsappNumber}?text=${whatsappMessage}`;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md overflow-y-auto">
-      <div className="relative w-full max-w-lg bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl overflow-hidden my-8">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/85 backdrop-blur-md overflow-y-auto">
+      <div className="relative w-full max-w-lg bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl overflow-hidden my-auto max-h-[94vh] flex flex-col">
         {/* Header */}
-        <div className="px-6 py-4 bg-slate-950/70 border-b border-slate-800 flex items-center justify-between">
-          <div className="flex items-center gap-3">
+        <div className="px-4 sm:px-6 py-3.5 sm:py-4 bg-slate-950/80 border-b border-slate-800 flex items-center justify-between shrink-0">
+          <div className="flex items-center gap-2.5 sm:gap-3">
             <div className="w-8 h-8 rounded-lg bg-slate-950 border border-amber-500/40 p-0.5 overflow-hidden flex items-center justify-center shrink-0">
               <img
                 src={gymLogo}
@@ -121,7 +121,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                 className="w-full h-full object-contain rounded"
               />
             </div>
-            <span className="font-display font-bold text-white text-base">
+            <span className="font-display font-black text-white text-sm sm:text-base">
               {step === 'form' ? 'Finalizar Reserva de Números' : '¡Reserva Registrada con Éxito!'}
             </span>
           </div>
@@ -134,22 +134,22 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
         </div>
 
         {step === 'form' ? (
-          <form onSubmit={handleSubmit} className="p-6 space-y-5">
+          <form onSubmit={handleSubmit} className="p-4 sm:p-6 space-y-4 sm:space-y-5 overflow-y-auto flex-1">
             {/* Order summary pill */}
-            <div className="bg-slate-950/80 p-4 rounded-xl border border-slate-800 flex items-center justify-between">
+            <div className="bg-slate-950/80 p-3 sm:p-4 rounded-xl border border-slate-800 flex items-center justify-between">
               <div>
-                <div className="text-xs text-slate-400">Números seleccionados ({selectedNumbers.length}):</div>
-                <div className="font-mono text-sm font-bold text-amber-400 mt-0.5">
+                <div className="text-[11px] sm:text-xs text-slate-400">Números seleccionados ({selectedNumbers.length}):</div>
+                <div className="font-mono text-xs sm:text-sm font-bold text-amber-400 mt-0.5">
                   {formattedNumbers}
                 </div>
               </div>
               <div className="text-right">
-                <div className="text-xs text-slate-400">Total a abonar:</div>
-                <div className="text-lg font-display font-extrabold text-white tabular-nums">
+                <div className="text-[11px] sm:text-xs text-slate-400">Total a abonar:</div>
+                <div className="text-base sm:text-lg font-display font-black text-white tabular-nums">
                   {formatARS(pricing.total)}
                 </div>
                 {pricing.badge && (
-                  <div className="text-[10px] text-amber-300 font-semibold mt-0.5">
+                  <div className="text-[10px] text-amber-300 font-bold mt-0.5">
                     {pricing.badge}
                   </div>
                 )}
@@ -162,8 +162,8 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
             </div>
 
             {/* Buyer inputs */}
-            <div className="space-y-3.5">
-              <div className="text-xs font-bold text-slate-400 uppercase tracking-wider">
+            <div className="space-y-3">
+              <div className="text-[11px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider">
                 1. Tus Datos de Contacto
               </div>
 
@@ -176,7 +176,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   placeholder="Ej: Juan Pérez"
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-sm text-white focus:outline-none focus:border-amber-400 transition-colors"
+                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-base sm:text-sm text-white focus:outline-none focus:border-amber-400 transition-colors"
                 />
                 {errors.name && <p className="text-[11px] text-rose-400 mt-1">{errors.name}</p>}
               </div>
