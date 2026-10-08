@@ -1,4 +1,7 @@
 import { RaffleConfig, TicketNumber, Prize, Order } from '../types';
+import fiatMobiGarage from '../assets/images/prize_fiat_mobi_garage_1791427345842.jpg';
+import fiatMobiHero from '../assets/images/prize_fiat_mobi_hero_1791427336822.jpg';
+import fiatMobiInterior from '../assets/images/prize_fiat_mobi_interior_1791427354188.jpg';
 
 export const DEFAULT_RAFFLE_CONFIG: RaffleConfig = {
   title: 'GRAN RIFA OFICIAL DOMINUS GYM',
@@ -41,11 +44,11 @@ export const INITIAL_PRIZES: Prize[] = [
     name: 'Fiat Mobi 2017 IMPECABLE 😍',
     badge: 'ÚNICO PREMIO',
     description: 'Vehículo en estado inmaculado (10/10), 100% al día y listo para transferir. Muy bajo consumo, ideal para la ciudad o ruta. ¡El ganador se lleva el auto!',
-    image: '/src/assets/images/prize_fiat_mobi_garage_1791427345842.jpg',
+    image: fiatMobiGarage,
     gallery: [
-      '/src/assets/images/prize_fiat_mobi_garage_1791427345842.jpg',
-      '/src/assets/images/prize_fiat_mobi_hero_1791427336822.jpg',
-      '/src/assets/images/prize_fiat_mobi_interior_1791427354188.jpg',
+      fiatMobiGarage,
+      fiatMobiHero,
+      fiatMobiInterior,
     ],
     specs: {
       'Modelo': 'Fiat Mobi Way / Easy 2017',

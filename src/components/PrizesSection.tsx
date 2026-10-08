@@ -2,22 +2,34 @@ import React, { useState } from 'react';
 import { Trophy, CheckCircle2, ShieldCheck, Sparkles, ChevronRight, Fuel, Gauge, Car, FileCheck } from 'lucide-react';
 import { Prize } from '../types';
 import gymBg from '../assets/images/hero_dominus_gym_1791425995831.jpg';
+import fiatMobiGarage from '../assets/images/prize_fiat_mobi_garage_1791427345842.jpg';
+import fiatMobiHero from '../assets/images/prize_fiat_mobi_hero_1791427336822.jpg';
+import fiatMobiInterior from '../assets/images/prize_fiat_mobi_interior_1791427354188.jpg';
 
 interface PrizesSectionProps {
   prizes: Prize[];
   onChooseNumbers: () => void;
 }
 
+// Resuelve URLs estáticas tanto de desarrollo como de compilación de producción en Vercel/Render
+const resolveCarImage = (url: string | undefined, defaultFallback: string = fiatMobiGarage): string => {
+  if (!url) return defaultFallback;
+  if (url.includes('garage') || url.includes('1791427345842')) return fiatMobiGarage;
+  if (url.includes('hero') || url.includes('1791427336822')) return fiatMobiHero;
+  if (url.includes('interior') || url.includes('1791427354188')) return fiatMobiInterior;
+  return url;
+};
+
 export const PrizesSection: React.FC<PrizesSectionProps> = ({ prizes, onChooseNumbers }) => {
   const prize = prizes[0] || {
     name: 'Fiat Mobi 2017 IMPECABLE 😍',
     badge: 'ÚNICO PREMIO',
     description: 'Vehículo en estado inmaculado (10/10), 100% al día y listo para transferir. Muy bajo consumo, ideal para la ciudad o ruta.',
-    image: '/src/assets/images/prize_fiat_mobi_garage_1791427345842.jpg',
+    image: fiatMobiGarage,
     gallery: [
-      '/src/assets/images/prize_fiat_mobi_garage_1791427345842.jpg',
-      '/src/assets/images/prize_fiat_mobi_hero_1791427336822.jpg',
-      '/src/assets/images/prize_fiat_mobi_interior_1791427354188.jpg',
+      fiatMobiGarage,
+      fiatMobiHero,
+      fiatMobiInterior,
     ],
     items: [
       'Aire acondicionado congelando y calefacción de alta potencia',
@@ -37,8 +49,9 @@ export const PrizesSection: React.FC<PrizesSectionProps> = ({ prizes, onChooseNu
     },
   };
 
-  const gallery = prize.gallery && prize.gallery.length > 0 ? prize.gallery : [prize.image];
-  const [activePhoto, setActivePhoto] = useState(gallery[0]);
+  const rawGallery = prize.gallery && prize.gallery.length > 0 ? prize.gallery : [prize.image];
+  const gallery = rawGallery.map((img, idx) => resolveCarImage(img, idx === 1 ? fiatMobiHero : idx === 2 ? fiatMobiInterior : fiatMobiGarage));
+  const [activePhoto, setActivePhoto] = useState(gallery[0] || fiatMobiGarage);
 
   return (
     <section id="premios" className="relative py-16 md:py-24 bg-[#0B0F17] border-t border-b border-slate-800/80 overflow-hidden">
@@ -93,6 +106,9 @@ export const PrizesSection: React.FC<PrizesSectionProps> = ({ prizes, onChooseNu
                     src={activePhoto}
                     alt="Fiat Mobi 2017 IMPECABLE"
                     referrerPolicy="no-referrer"
+                    onError={(e) => {
+                      (e.currentTarget as HTMLImageElement).src = fiatMobiGarage;
+                    }}
                     className="w-full h-full object-cover object-center transition-all duration-300"
                   />
                   <div className="absolute top-3 left-3 bg-slate-950/80 backdrop-blur-md px-3 py-1 rounded-lg border border-slate-700 text-xs font-bold text-white flex items-center gap-1.5">
@@ -120,6 +136,10 @@ export const PrizesSection: React.FC<PrizesSectionProps> = ({ prizes, onChooseNu
                         src={img}
                         alt={`Vista ${idx + 1}`}
                         referrerPolicy="no-referrer"
+                        onError={(e) => {
+                          const fallback = idx === 1 ? fiatMobiHero : idx === 2 ? fiatMobiInterior : fiatMobiGarage;
+                          (e.currentTarget as HTMLImageElement).src = fallback;
+                        }}
                         className="w-full h-full object-cover"
                       />
                     </button>

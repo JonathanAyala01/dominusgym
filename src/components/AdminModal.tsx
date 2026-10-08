@@ -38,6 +38,10 @@ import {
   ShieldCheck,
   Rocket,
   Globe,
+  Link2,
+  Radio,
+  Activity,
+  ArrowRight,
 } from 'lucide-react';
 
 const DEFAULT_MASTER_PASSWORD = 'admin@dominus2026';
@@ -48,7 +52,7 @@ import { calculateTotal, formatARS } from '../utils/pricing';
 import { sounds } from '../utils/audio';
 import { launchConfetti } from '../utils/confetti';
 import { generateMysqlScript } from '../utils/sqlGenerator';
-import { api, DbStatusResponse, DbTestResult } from '../services/api';
+import { api, DbStatusResponse, DbTestResult, STORAGE_BACKEND_URL_KEY } from '../services/api';
 import gymLogo from '../assets/images/logo.jpeg';
 
 interface AdminModalProps {
@@ -130,7 +134,20 @@ export const AdminModal: React.FC<AdminModalProps> = ({
   const [copiedResetSql, setCopiedResetSql] = useState(false);
   const [resetSuccessMessage, setResetSuccessMessage] = useState(false);
   const [copiedDeploySnippet, setCopiedDeploySnippet] = useState<string | null>(null);
-  const [deployActivePlatform, setDeployActivePlatform] = useState<'vercel' | 'render'>('vercel');
+  const [deployActivePlatform, setDeployActivePlatform] = useState<'vercel' | 'render' | 'connect'>('connect');
+  const [customRenderUrl, setCustomRenderUrl] = useState<string>(() => {
+    return (typeof localStorage !== 'undefined' ? localStorage.getItem(STORAGE_BACKEND_URL_KEY) : '') || '';
+  });
+  const [testingRenderConnection, setTestingRenderConnection] = useState(false);
+  const [renderHealthResult, setRenderHealthResult] = useState<{
+    tested: boolean;
+    connected: boolean;
+    pingMs?: number;
+    url?: string;
+    data?: any;
+    error?: string;
+  } | null>(null);
+  const [savedRenderUrlSuccess, setSavedRenderUrlSuccess] = useState(false);
   
   // Orders filter & search
   const [orderFilter, setOrderFilter] = useState<'all' | 'pending' | 'confirmed'>('all');
@@ -2716,7 +2733,18 @@ SET FOREIGN_KEY_CHECKS = 1;
                   </p>
                 </div>
 
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <button
+                    onClick={() => setDeployActivePlatform('connect')}
+                    className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+                      deployActivePlatform === 'connect'
+                        ? 'bg-gradient-to-r from-cyan-500 to-indigo-500 text-white shadow-md shadow-cyan-500/20 ring-2 ring-cyan-400/50'
+                        : 'bg-slate-800 text-slate-300 hover:text-white'
+                    }`}
+                  >
+                    <Link2 className="w-3.5 h-3.5 text-cyan-300" />
+                    <span>🔗 Conectar Ambos (Vercel + Render)</span>
+                  </button>
                   <button
                     onClick={() => setDeployActivePlatform('vercel')}
                     className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
@@ -2726,7 +2754,7 @@ SET FOREIGN_KEY_CHECKS = 1;
                     }`}
                   >
                     <Globe className="w-3.5 h-3.5" />
-                    <span>Vercel</span>
+                    <span>Vercel (Frontend)</span>
                   </button>
                   <button
                     onClick={() => setDeployActivePlatform('render')}
@@ -2737,10 +2765,407 @@ SET FOREIGN_KEY_CHECKS = 1;
                     }`}
                   >
                     <Server className="w-3.5 h-3.5" />
-                    <span>Render</span>
+                    <span>Render (Backend API)</span>
                   </button>
                 </div>
               </div>
+
+              {/* CONNECT VERCEL & RENDER GUIDE & LIVE TESTER */}
+              {deployActivePlatform === 'connect' && (
+                <div className="space-y-6">
+                  {/* Visual Architecture Diagram */}
+                  <div className="p-5 bg-slate-950 rounded-2xl border border-cyan-500/30 space-y-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <Link2 className="w-5 h-5 text-cyan-400" />
+                        <h4 className="font-display font-black text-white text-base">
+                          ¿Cómo Trabajan Juntos Vercel y Render?
+                        </h4>
+                      </div>
+                      <span className="text-[11px] font-mono font-bold bg-cyan-500/20 text-cyan-300 px-2.5 py-1 rounded-full border border-cyan-500/30">
+                        Arquitectura Moderna Desacoplada
+                      </span>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3 pt-2">
+                      {/* Box 1: Vercel */}
+                      <div className="p-4 bg-slate-900/90 rounded-xl border border-slate-800 relative space-y-2">
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs font-black text-white flex items-center gap-1.5">
+                            <Globe className="w-4 h-4 text-cyan-400" /> Vercel (Frontend)
+                          </span>
+                          <span className="text-[10px] bg-slate-800 text-slate-300 px-1.5 py-0.5 rounded font-mono">
+                            React SPA
+                          </span>
+                        </div>
+                        <p className="text-xs text-slate-300">
+                          Entrega la interfaz ultrarrápida a los socios mediante CDN global. Gestiona diseño, catálogo de números, carrito y comprobantes.
+                        </p>
+                        <div className="text-[11px] text-cyan-300 font-mono">
+                          👉 Envía peticiones API a Render
+                        </div>
+                      </div>
+
+                      {/* Box 2: Render */}
+                      <div className="p-4 bg-slate-900/90 rounded-xl border border-indigo-500/40 relative space-y-2">
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs font-black text-white flex items-center gap-1.5">
+                            <Server className="w-4 h-4 text-indigo-400" /> Render (Backend API)
+                          </span>
+                          <span className="text-[10px] bg-indigo-500/20 text-indigo-300 px-1.5 py-0.5 rounded font-mono">
+                            Node Express
+                          </span>
+                        </div>
+                        <p className="text-xs text-slate-300">
+                          Servidor en segundo plano que atiende las rutas <code className="text-amber-400 font-mono">/api/*</code>, ejecuta consultas a la base de datos y genera backups SQL.
+                        </p>
+                        <div className="text-[11px] text-indigo-300 font-mono">
+                          👉 Conecta con base de datos MySQL
+                        </div>
+                      </div>
+
+                      {/* Box 3: MySQL */}
+                      <div className="p-4 bg-slate-900/90 rounded-xl border border-amber-500/30 relative space-y-2">
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs font-black text-white flex items-center gap-1.5">
+                            <Database className="w-4 h-4 text-amber-400" /> Base de Datos MySQL
+                          </span>
+                          <span className="text-[10px] bg-amber-500/20 text-amber-300 px-1.5 py-0.5 rounded font-mono">
+                            Persistencia
+                          </span>
+                        </div>
+                        <p className="text-xs text-slate-300">
+                          Almacena tablas <code className="text-white font-mono">tickets</code>, <code className="text-white font-mono">orders</code> y <code className="text-white font-mono">raffle_config</code>.
+                        </p>
+                        <div className="text-[11px] text-amber-300 font-mono">
+                          👉 Alojada en cPanel, Railway o Cloud
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* PROBADOR Y CONFIGURADOR EN VIVO */}
+                  <div className="p-5 bg-gradient-to-br from-slate-900 to-indigo-950/40 rounded-2xl border border-indigo-500/30 space-y-4">
+                    <div className="flex items-center justify-between flex-wrap gap-2">
+                      <div className="flex items-center gap-2">
+                        <Radio className="w-5 h-5 text-indigo-400" />
+                        <div>
+                          <h4 className="font-display font-black text-white text-base">
+                            Probador y Conector en Vivo de Render
+                          </h4>
+                          <p className="text-xs text-slate-300">
+                            Pega la URL de tu Web Service de Render para vincularlo inmediatamente con esta app.
+                          </p>
+                        </div>
+                      </div>
+                      {customRenderUrl && (
+                        <span className="text-[11px] font-mono bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 px-2.5 py-1 rounded-lg">
+                          Actualmente configurado
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="space-y-3">
+                      <label className="text-xs font-bold text-slate-300 block">
+                        URL Pública de tu Backend en Render (Web Service):
+                      </label>
+                      <div className="flex flex-col sm:flex-row gap-2">
+                        <div className="relative flex-1">
+                          <input
+                            type="url"
+                            value={customRenderUrl}
+                            onChange={(e) => {
+                              setCustomRenderUrl(e.target.value);
+                              setRenderHealthResult(null);
+                              setSavedRenderUrlSuccess(false);
+                            }}
+                            placeholder="https://dominus-gym-api.onrender.com"
+                            className="w-full bg-slate-950 border border-slate-700 focus:border-indigo-400 rounded-xl px-4 py-2.5 text-xs text-white placeholder-slate-500 font-mono outline-none"
+                          />
+                        </div>
+
+                        {/* Botón Probar */}
+                        <button
+                          onClick={async () => {
+                            if (!customRenderUrl.trim()) return;
+                            setTestingRenderConnection(true);
+                            setRenderHealthResult(null);
+                            try {
+                              const res = await api.checkBackendHealth(customRenderUrl);
+                              setRenderHealthResult({
+                                tested: true,
+                                connected: res.connected,
+                                pingMs: res.pingMs,
+                                data: res.data,
+                                error: res.error,
+                              });
+                              if (res.connected) {
+                                sounds.playWinnerFanfare();
+                              }
+                            } finally {
+                              setTestingRenderConnection(false);
+                            }
+                          }}
+                          disabled={testingRenderConnection || !customRenderUrl.trim()}
+                          className="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-1.5 cursor-pointer transition-all shadow-md"
+                        >
+                          {testingRenderConnection ? (
+                            <>
+                              <RefreshCw className="w-4 h-4 animate-spin" />
+                              <span>Probando Conexión...</span>
+                            </>
+                          ) : (
+                            <>
+                              <Activity className="w-4 h-4" />
+                              <span>Probar Salud (`/api/health`)</span>
+                            </>
+                          )}
+                        </button>
+
+                        {/* Botón Guardar */}
+                        <button
+                          onClick={() => {
+                            api.setApiBaseUrl(customRenderUrl);
+                            setSavedRenderUrlSuccess(true);
+                            setTimeout(() => setSavedRenderUrlSuccess(false), 3000);
+                          }}
+                          disabled={!customRenderUrl.trim()}
+                          className="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-1.5 cursor-pointer transition-all shadow-md"
+                        >
+                          {savedRenderUrlSuccess ? (
+                            <>
+                              <Check className="w-4 h-4" />
+                              <span>¡URL Guardada!</span>
+                            </>
+                          ) : (
+                            <>
+                              <CheckCircle2 className="w-4 h-4" />
+                              <span>Guardar en Esta App</span>
+                            </>
+                          )}
+                        </button>
+                      </div>
+
+                      {/* Resultado de la prueba en vivo */}
+                      {renderHealthResult && (
+                        <div
+                          className={`p-3.5 rounded-xl border text-xs flex items-start gap-2.5 animate-fadeIn ${
+                            renderHealthResult.connected
+                              ? 'bg-emerald-950/40 border-emerald-500/40 text-emerald-200'
+                              : 'bg-rose-950/40 border-rose-500/40 text-rose-200'
+                          }`}
+                        >
+                          {renderHealthResult.connected ? (
+                            <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0 mt-0.5" />
+                          ) : (
+                            <AlertTriangle className="w-5 h-5 text-rose-400 shrink-0 mt-0.5" />
+                          )}
+                          <div className="space-y-1">
+                            <div className="font-bold text-white text-xs">
+                              {renderHealthResult.connected
+                                ? `¡Conexión Exitosa con Render! (${renderHealthResult.pingMs} ms de latencia)`
+                                : 'No se pudo conectar con el backend de Render'}
+                            </div>
+                            <div className="text-[11px]">
+                              {renderHealthResult.connected ? (
+                                <span>
+                                  Servicio: <strong className="text-emerald-300 font-mono">{renderHealthResult.data?.service || 'DOMINUS GYM Backend'}</strong> — Driver MySQL: <span className="font-mono">{renderHealthResult.data?.mysqlDriver || 'mysql2'}</span>.
+                                </span>
+                              ) : (
+                                <div>
+                                  <p className="text-rose-300">{renderHealthResult.error}</p>
+                                  <p className="text-[10px] text-slate-400 mt-1">
+                                    💡 <em>Nota:</em> Si tu servicio en Render usa el Plan Free y no ha recibido visitas en los últimos 15 minutos, el servidor entra en estado de suspensión (sleep). Tarda aproximadamente 40 a 50 segundos en despertar en la primera petición. Dale 30 segundos y vuelve a probar.
+                                  </p>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* GUÍA PASO A PASO: LOS 2 MÉTODOS DE CONEXIÓN */}
+                  <div className="space-y-4">
+                    <h4 className="font-display font-black text-white text-base flex items-center gap-2">
+                      <Terminal className="w-4 h-4 text-cyan-400" />
+                      Pasos para Conectar Vercel con Render en Producción
+                    </h4>
+
+                    {/* MÉTODO 1 (RECOMENDADO): VARIABLE DE ENTORNO EN VERCEL */}
+                    <div className="p-5 bg-slate-950 rounded-2xl border border-slate-800 space-y-3">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <span className="w-6 h-6 rounded-full bg-indigo-500 text-white font-mono text-xs font-black flex items-center justify-center">
+                            1
+                          </span>
+                          <span className="font-bold text-white text-sm">
+                            Método 1 (Recomendado): Variable de Entorno en Vercel
+                          </span>
+                        </div>
+                        <span className="text-[10px] font-bold uppercase tracking-wider bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded">
+                          Más Fácil y Flexible
+                        </span>
+                      </div>
+
+                      <p className="text-xs text-slate-300 leading-relaxed">
+                        Este método le indica a la web en Vercel cuál es la URL exacta de Render para todas las llamadas API:
+                      </p>
+
+                      <ol className="list-decimal list-inside text-xs text-slate-300 space-y-2 pl-2">
+                        <li>
+                          Ve al panel de tu proyecto en <strong>Vercel</strong> ➔ pestaña <strong>Settings</strong> ➔ <strong>Environment Variables</strong>.
+                        </li>
+                        <li>
+                          Agrega la siguiente variable de entorno:
+                        </li>
+                      </ol>
+
+                      {/* Snippet Variable */}
+                      <div className="p-3 bg-slate-900 rounded-xl border border-slate-800 flex items-center justify-between gap-2">
+                        <div className="font-mono text-xs text-white">
+                          <span className="text-cyan-400">VITE_API_BASE_URL</span> ={' '}
+                          <span className="text-amber-400">
+                            {customRenderUrl.trim() || 'https://tu-servicio-render.onrender.com'}
+                          </span>
+                        </div>
+                        <button
+                          onClick={() => {
+                            const val = customRenderUrl.trim() || 'https://tu-servicio-render.onrender.com';
+                            navigator.clipboard.writeText(`VITE_API_BASE_URL=${val}`);
+                            setCopiedDeploySnippet('vite_var');
+                            setTimeout(() => setCopiedDeploySnippet(null), 2000);
+                          }}
+                          className="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold rounded-lg flex items-center gap-1 cursor-pointer transition-colors shrink-0"
+                        >
+                          {copiedDeploySnippet === 'vite_var' ? (
+                            <>
+                              <Check className="w-3 h-3 text-emerald-400" />
+                              <span className="text-emerald-400">Copiado</span>
+                            </>
+                          ) : (
+                            <>
+                              <Copy className="w-3 h-3" />
+                              <span>Copiar Par Variable</span>
+                            </>
+                          )}
+                        </button>
+                      </div>
+
+                      <div className="text-xs text-slate-400 flex items-center gap-1.5">
+                        <ArrowRight className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
+                        <span>
+                          En Vercel haz clic en <strong>Save</strong> y luego en <strong>Deployments ➔ Redeploy</strong> para que la web aplique la variable.
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* MÉTODO 2: REWRITE PROXY EN VERCEL.JSON */}
+                    <div className="p-5 bg-slate-950 rounded-2xl border border-slate-800 space-y-3">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <span className="w-6 h-6 rounded-full bg-slate-800 text-slate-300 font-mono text-xs font-black flex items-center justify-center">
+                            2
+                          </span>
+                          <span className="font-bold text-white text-sm">
+                            Método 2 (Sin CORS): Proxy Transparente en vercel.json
+                          </span>
+                        </div>
+                        <span className="text-[10px] font-bold uppercase tracking-wider bg-slate-800 text-slate-400 px-2 py-0.5 rounded">
+                          Nivel Enterprise
+                        </span>
+                      </div>
+
+                      <p className="text-xs text-slate-300 leading-relaxed">
+                        Con este método, Vercel reenvía silenciosamente cualquier petición interna a <code className="text-amber-400 font-mono">/api/*</code> hacia Render sin que el navegador note que son dominios distintos.
+                      </p>
+
+                      <div className="flex items-center justify-between">
+                        <span className="text-[11px] text-slate-400 font-mono">
+                          Reemplaza el archivo <strong className="text-white">vercel.json</strong> en la raíz del proyecto con esto:
+                        </span>
+                        <button
+                          onClick={() => {
+                            const renderDest = customRenderUrl.trim() || 'https://tu-servicio-render.onrender.com';
+                            const jsonContent = JSON.stringify(
+                              {
+                                buildCommand: 'npm run build',
+                                outputDirectory: 'dist',
+                                framework: 'vite',
+                                rewrites: [
+                                  {
+                                    source: '/api/:path*',
+                                    destination: `${renderDest}/api/:path*`,
+                                  },
+                                  {
+                                    source: '/(.*)',
+                                    destination: '/index.html',
+                                  },
+                                ],
+                              },
+                              null,
+                              2
+                            );
+                            navigator.clipboard.writeText(jsonContent);
+                            setCopiedDeploySnippet('vercel_json_proxy');
+                            setTimeout(() => setCopiedDeploySnippet(null), 2000);
+                          }}
+                          className="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold rounded-lg flex items-center gap-1 cursor-pointer transition-colors"
+                        >
+                          {copiedDeploySnippet === 'vercel_json_proxy' ? (
+                            <>
+                              <Check className="w-3 h-3 text-emerald-400" />
+                              <span className="text-emerald-400">Copiado</span>
+                            </>
+                          ) : (
+                            <>
+                              <Copy className="w-3 h-3" />
+                              <span>Copiar vercel.json con Proxy</span>
+                            </>
+                          )}
+                        </button>
+                      </div>
+
+                      <pre className="p-3 bg-slate-900 rounded-xl text-[11px] font-mono text-cyan-300/90 overflow-x-auto">
+{`{
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
+  "framework": "vite",
+  "rewrites": [
+    {
+      "source": "/api/:path*",
+      "destination": "${customRenderUrl.trim() || 'https://tu-servicio-render.onrender.com'}/api/:path*"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}`}
+                      </pre>
+                    </div>
+
+                    {/* CONSEJO DE ORO: FREE TIER DE RENDER */}
+                    <div className="p-4 bg-amber-500/10 border border-amber-500/20 rounded-xl space-y-2">
+                      <div className="flex items-center gap-2">
+                        <AlertTriangle className="w-4 h-4 text-amber-400" />
+                        <span className="text-xs font-bold text-amber-300">
+                          Consejo Pro para el Plan Free de Render (Evitar demoras de 50s):
+                        </span>
+                      </div>
+                      <p className="text-xs text-slate-300 leading-relaxed">
+                        En el plan gratuito de Render, los servidores se duermen tras 15 minutos sin peticiones. Para que tu backend esté <strong>siempre despierto</strong> y responda en milisegundos cuando un socio compre un número:
+                      </p>
+                      <ul className="list-disc list-inside text-xs text-slate-400 space-y-1 pl-1">
+                        <li>Crea una cuenta gratuita en <strong className="text-white">UptimeRobot.com</strong> o <strong className="text-white">cron-job.org</strong>.</li>
+                        <li>Configura un monitor HTTP tipo <code className="text-amber-400 font-mono">GET</code> cada <strong>10 minutos</strong> hacia: <code className="text-white font-mono">{customRenderUrl.trim() || 'https://tu-servicio-render.onrender.com'}/api/health</code>.</li>
+                        <li>¡Listo! Render nunca entrará en suspensión y tu sistema responderá instantáneamente.</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              )}
 
               {/* VERCEL PLATFORM GUIDE */}
               {deployActivePlatform === 'vercel' && (
@@ -2872,8 +3297,8 @@ SET FOREIGN_KEY_CHECKS = 1;
                     </div>
                     <div className="p-4 bg-slate-950 rounded-xl border border-slate-800 space-y-1.5">
                       <div className="text-xs font-bold text-slate-400">Build Command</div>
-                      <div className="text-sm font-mono font-bold text-amber-400">npm install && npm run build</div>
-                      <div className="text-[11px] text-slate-400">Instala y compila el frontend</div>
+                      <div className="text-sm font-mono font-bold text-amber-400">npm install --legacy-peer-deps && npm run build</div>
+                      <div className="text-[11px] text-slate-400">Instala y compila el frontend sin conflictos</div>
                     </div>
                     <div className="p-4 bg-slate-950 rounded-xl border border-slate-800 space-y-1.5">
                       <div className="text-xs font-bold text-slate-400">Start Command</div>
@@ -2911,7 +3336,7 @@ SET FOREIGN_KEY_CHECKS = 1;
                         <strong className="text-white">Configuración del Servicio:</strong>
                         <div className="mt-2 pl-4 space-y-1 text-slate-300 font-mono text-[11px]">
                           <div>• Runtime: <strong className="text-white">Node</strong></div>
-                          <div>• Build Command: <strong className="text-amber-400">npm install && npm run build</strong></div>
+                          <div>• Build Command: <strong className="text-amber-400">npm install --legacy-peer-deps && npm run build</strong></div>
                           <div>• Start Command: <strong className="text-emerald-400">npm start</strong></div>
                           <div>• Plan: <strong className="text-white">Free</strong> ($0 / mes)</div>
                         </div>

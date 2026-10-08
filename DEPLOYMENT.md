@@ -66,8 +66,9 @@ Render es excelente si quieres que tu backend Express (`server.ts`) corra en viv
    - **Language / Runtime**: `Node`
    - **Build Command**:
      ```bash
-     npm install && npm run build
+     npm install --legacy-peer-deps && npm run build
      ```
+     *(El flag `--legacy-peer-deps` o el archivo `.npmrc` ya incluido evita conflictos de dependencias entre Vite y Tailwind en Node 20+)*
    - **Start Command**:
      ```bash
      npm start
@@ -90,6 +91,94 @@ Render es excelente si quieres que tu backend Express (`server.ts`) corra en viv
 5. Haz clic en **"Deploy Web Service"**.
    - Render construirá la app y te dará una URL pública HTTPS gratuita tipo:
      `https://dominus-gym-rifa.onrender.com`.
+
+---
+
+## 🔗 Cómo Conectar Ambos: Vercel (Frontend) con Render (Backend API)
+
+Esta es la arquitectura recomendada por ingenieros:
+- **Vercel**: Sirve la web a los usuarios con la velocidad máxima de su CDN global (React + Vite).
+- **Render**: Ejecuta el servidor Node.js/Express (`server.ts`) y atiende las llamadas `/api/*` y la base de datos MySQL.
+
+```
+[ Usuario en su Móvil/PC ] 
+          │
+          ▼ (Carga ultrarrápida)
+   [ VERCEL: Frontend React ]  
+          │
+          ▼ (Llamadas API: /api/db/status, /api/db/test, etc.)
+   [ RENDER: Backend Express Node.js ] 
+          │
+          ▼
+   [ BASE DE DATOS MYSQL ]
+```
+
+### Paso 1: Despliega tu Backend en Render
+1. Sigue los pasos de la **Opción 2** más arriba para crear tu **Web Service** en Render.
+2. Una vez finalizado el deploy, copia la URL que te asigna Render, por ejemplo:
+   `https://dominus-gym-api.onrender.com`
+3. Comprueba que responda abriendo en tu navegador:
+   `https://dominus-gym-api.onrender.com/api/health`
+   *(Debe responder un JSON con `status: "ok"`)*.
+
+---
+
+### Paso 2: Conectar Vercel con la URL de Render
+
+Tienes **2 opciones excelentes**:
+
+#### Método A (Recomendado y más rápido): Variable de Entorno en Vercel
+1. Entra a tu proyecto en [vercel.com](https://vercel.com).
+2. Ve a la pestaña **Settings** ➔ **Environment Variables**.
+3. Añade la siguiente variable:
+   - **Key**: `VITE_API_BASE_URL`
+   - **Value**: `https://dominus-gym-api.onrender.com` *(la URL de tu Render sin barra final)*
+4. Guarda y ve a **Deployments** ➔ Haz clic en los tres puntos (...) del último deployment ➔ **Redeploy**.
+5. ¡Listo! El frontend ahora enviará todas sus consultas directamente a tu servidor en Render. El servidor ya cuenta con **CORS habilitado** para autorizar peticiones desde Vercel.
+
+#### Método B: Proxy Silencioso en `vercel.json` (Sin CORS)
+Si prefieres que Vercel reenvíe internamente las peticiones sin que el navegador cambie de dominio, edita tu archivo `vercel.json`:
+```json
+{
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
+  "framework": "vite",
+  "rewrites": [
+    {
+      "source": "/api/:path*",
+      "destination": "https://dominus-gym-api.onrender.com/api/:path*"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}
+```
+Haz `git commit` y `git push` a GitHub y Vercel se actualizará automáticamente.
+
+---
+
+### Paso 3: Probar la Conexión desde el Panel de Admin
+Dentro del sistema:
+1. Abre el **Panel de Administración** (ícono de candado en la web).
+2. Ve a la pestaña **"🚀 Despliegue (Vercel & Render)"**.
+3. En la sección **"🔗 Conectar Ambos (Vercel + Render)"**:
+   - Pega tu URL de Render.
+   - Haz clic en **"Probar Salud (/api/health)"**.
+   - Verás la latencia en milisegundos y el estado en vivo.
+   - Haz clic en **"Guardar en Esta App"**.
+
+---
+
+### ⚠️ Consejo para el Plan Free de Render (Evitar suspensión / Cold Start)
+En el plan gratuito de Render, los servidores se suspenden ("duermen") tras 15 minutos sin visitas y tardan unos 45 segundos en despertar con la primera petición.
+
+Para mantener tu backend **100% despierto 24/7**:
+1. Entra a [uptimerobot.com](https://uptimerobot.com) (gratis).
+2. Crea un **HTTP Monitor** que consulte cada 10 minutos la URL:
+   `https://tu-servicio-render.onrender.com/api/health`
+3. ¡Listo! Render nunca entrará en suspensión y tus socios tendrán respuesta inmediata en cualquier momento del día.
 
 ---
 
