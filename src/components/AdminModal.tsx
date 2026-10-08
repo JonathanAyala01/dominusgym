@@ -36,6 +36,8 @@ import {
   KeyRound,
   LogOut,
   ShieldCheck,
+  Rocket,
+  Globe,
 } from 'lucide-react';
 
 const DEFAULT_MASTER_PASSWORD = 'admin@dominus2026';
@@ -68,7 +70,7 @@ interface AdminModalProps {
   onResetData: () => void;
 }
 
-type TabType = 'overview' | 'orders' | 'cash_sale' | 'tickets' | 'bolillero' | 'config' | 'mysql';
+type TabType = 'overview' | 'orders' | 'cash_sale' | 'tickets' | 'bolillero' | 'config' | 'mysql' | 'deploy';
 
 export const AdminModal: React.FC<AdminModalProps> = ({
   isOpen,
@@ -127,6 +129,8 @@ export const AdminModal: React.FC<AdminModalProps> = ({
   const [dbSubTab, setDbSubTab] = useState<'status' | 'export' | 'schema' | 'guide' | 'reset'>('status');
   const [copiedResetSql, setCopiedResetSql] = useState(false);
   const [resetSuccessMessage, setResetSuccessMessage] = useState(false);
+  const [copiedDeploySnippet, setCopiedDeploySnippet] = useState<string | null>(null);
+  const [deployActivePlatform, setDeployActivePlatform] = useState<'vercel' | 'render'>('vercel');
   
   // Orders filter & search
   const [orderFilter, setOrderFilter] = useState<'all' | 'pending' | 'confirmed'>('all');
@@ -839,6 +843,21 @@ SET FOREIGN_KEY_CHECKS = 1;
             <span>Base de Datos MySQL</span>
             <span className="text-[10px] bg-cyan-500/20 text-cyan-300 px-1.5 py-0.2 rounded font-mono font-bold">
               SQL
+            </span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab('deploy')}
+            className={`py-3.5 border-b-2 cursor-pointer transition-colors whitespace-nowrap flex items-center gap-1.5 ${
+              activeTab === 'deploy'
+                ? 'border-indigo-400 text-indigo-400 font-extrabold'
+                : 'border-transparent text-slate-400 hover:text-indigo-300'
+            }`}
+          >
+            <Rocket className="w-3.5 h-3.5" />
+            <span>Levantar en Vercel & Render</span>
+            <span className="text-[10px] bg-indigo-500/20 text-indigo-300 px-1.5 py-0.2 rounded font-mono font-bold">
+              Cloud
             </span>
           </button>
         </div>
@@ -2677,6 +2696,344 @@ SET FOREIGN_KEY_CHECKS = 1;
                   </div>
                 </div>
               )}
+            </div>
+          )}
+
+          {/* TAB 8: LEVANTAR EN VERCEL Y RENDER */}
+          {activeTab === 'deploy' && (
+            <div className="space-y-6">
+              {/* Header Banner */}
+              <div className="p-5 bg-gradient-to-r from-indigo-950/70 via-purple-950/40 to-slate-950 rounded-2xl border border-indigo-500/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <Rocket className="w-5 h-5 text-indigo-400" />
+                    <h3 className="font-display font-black text-white text-base sm:text-lg">
+                      Guía Oficial para Desplegar en la Nube
+                    </h3>
+                  </div>
+                  <p className="text-xs text-slate-300 mt-1 max-w-xl">
+                    Tu sistema está listo para producción. Puedes alojar la web en <strong className="text-white">Vercel</strong> (frontend ultrarrápido y gratuito) o en <strong className="text-white">Render</strong> (servidor Node.js completo).
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => setDeployActivePlatform('vercel')}
+                    className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+                      deployActivePlatform === 'vercel'
+                        ? 'bg-white text-slate-950 shadow-md'
+                        : 'bg-slate-800 text-slate-400 hover:text-white'
+                    }`}
+                  >
+                    <Globe className="w-3.5 h-3.5" />
+                    <span>Vercel</span>
+                  </button>
+                  <button
+                    onClick={() => setDeployActivePlatform('render')}
+                    className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+                      deployActivePlatform === 'render'
+                        ? 'bg-indigo-500 text-white shadow-md'
+                        : 'bg-slate-800 text-slate-400 hover:text-white'
+                    }`}
+                  >
+                    <Server className="w-3.5 h-3.5" />
+                    <span>Render</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* VERCEL PLATFORM GUIDE */}
+              {deployActivePlatform === 'vercel' && (
+                <div className="space-y-5">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="p-4 bg-slate-950 rounded-xl border border-slate-800 space-y-1.5">
+                      <div className="text-xs font-bold text-slate-400">Framework</div>
+                      <div className="text-sm font-black text-white">Vite (React + Tailwind)</div>
+                      <div className="text-[11px] text-slate-400">Detección automática en Vercel</div>
+                    </div>
+                    <div className="p-4 bg-slate-950 rounded-xl border border-slate-800 space-y-1.5">
+                      <div className="text-xs font-bold text-slate-400">Comando de Build</div>
+                      <div className="text-sm font-mono font-bold text-amber-400">npm run build</div>
+                      <div className="text-[11px] text-slate-400">Genera la carpeta optimizada /dist</div>
+                    </div>
+                    <div className="p-4 bg-slate-950 rounded-xl border border-slate-800 space-y-1.5">
+                      <div className="text-xs font-bold text-slate-400">Directorio de Salida</div>
+                      <div className="text-sm font-mono font-bold text-emerald-400">dist</div>
+                      <div className="text-[11px] text-slate-400">Output Directory en Vercel</div>
+                    </div>
+                  </div>
+
+                  {/* Pasos Vercel */}
+                  <div className="p-5 bg-slate-950 rounded-2xl border border-slate-800 space-y-4">
+                    <h4 className="font-bold text-white text-sm flex items-center gap-2">
+                      <span className="w-6 h-6 rounded-full bg-indigo-500/20 text-indigo-400 text-xs flex items-center justify-center font-black">
+                        1
+                      </span>
+                      Pasos para levantar en Vercel (Paso a Paso)
+                    </h4>
+
+                    <ol className="space-y-3 text-xs text-slate-300 list-decimal list-inside pl-2">
+                      <li className="leading-relaxed">
+                        <strong className="text-white">Sube el código a GitHub:</strong> Inicializa el repositorio git y haz push a tu GitHub personal o de DOMINUS GYM.
+                      </li>
+                      <li className="leading-relaxed">
+                        <strong className="text-white">Inicia sesión en Vercel:</strong> Ingresa a{' '}
+                        <a
+                          href="https://vercel.com"
+                          target="_blank"
+                          rel="noreferrer"
+                          className="text-indigo-400 underline hover:text-indigo-300 inline-flex items-center gap-0.5"
+                        >
+                          vercel.com <ExternalLink className="w-3 h-3" />
+                        </a>{' '}
+                        con tu usuario de GitHub.
+                      </li>
+                      <li className="leading-relaxed">
+                        <strong className="text-white">Importar Proyecto:</strong> Haz clic en <span className="bg-slate-800 text-white px-2 py-0.5 rounded font-bold">Add New... ➔ Project</span> y selecciona el repositorio.
+                      </li>
+                      <li className="leading-relaxed">
+                        <strong className="text-white">Configuración de Build:</strong> Vercel detecta automáticamente <strong className="text-white">Vite</strong>. Comprueba que el <em>Output Directory</em> sea <strong className="text-emerald-400">dist</strong>.
+                      </li>
+                      <li className="leading-relaxed">
+                        <strong className="text-white">Haz clic en "Deploy":</strong> En aproximadamente 30 segundos tu sitio web estará online con certificado SSL gratuito (HTTPS).
+                      </li>
+                    </ol>
+                  </div>
+
+                  {/* Configuración vercel.json incluida */}
+                  <div className="p-5 bg-slate-950 rounded-2xl border border-slate-800 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <Code className="w-4 h-4 text-amber-400" />
+                        <span className="font-bold text-white text-xs">
+                          Archivo vercel.json (Ya creado e incluido en el proyecto)
+                        </span>
+                      </div>
+                      <button
+                        onClick={() => {
+                          const jsonText = JSON.stringify(
+                            {
+                              buildCommand: 'npm run build',
+                              outputDirectory: 'dist',
+                              framework: 'vite',
+                              rewrites: [{ source: '/(.*)', destination: '/index.html' }],
+                            },
+                            null,
+                            2
+                          );
+                          navigator.clipboard.writeText(jsonText);
+                          setCopiedDeploySnippet('vercel_json');
+                          setTimeout(() => setCopiedDeploySnippet(null), 2000);
+                        }}
+                        className="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold rounded-lg flex items-center gap-1 cursor-pointer transition-colors"
+                      >
+                        {copiedDeploySnippet === 'vercel_json' ? (
+                          <>
+                            <Check className="w-3 h-3 text-emerald-400" />
+                            <span className="text-emerald-400">Copiado</span>
+                          </>
+                        ) : (
+                          <>
+                            <Copy className="w-3 h-3" />
+                            <span>Copiar JSON</span>
+                          </>
+                        )}
+                      </button>
+                    </div>
+
+                    <pre className="p-3 bg-slate-900 rounded-xl border border-slate-800/80 text-[11px] font-mono text-slate-300 overflow-x-auto">
+{`{
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
+  "framework": "vite",
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}`}
+                    </pre>
+                    <p className="text-[11px] text-slate-400">
+                      💡 Este archivo asegura que la navegación SPA funcione perfectamente sin errores 404 al recargar la web.
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {/* RENDER PLATFORM GUIDE */}
+              {deployActivePlatform === 'render' && (
+                <div className="space-y-5">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="p-4 bg-slate-950 rounded-xl border border-slate-800 space-y-1.5">
+                      <div className="text-xs font-bold text-slate-400">Tipo de Servicio</div>
+                      <div className="text-sm font-black text-indigo-400">Web Service (Node)</div>
+                      <div className="text-[11px] text-slate-400">Corre el servidor Express y Vite</div>
+                    </div>
+                    <div className="p-4 bg-slate-950 rounded-xl border border-slate-800 space-y-1.5">
+                      <div className="text-xs font-bold text-slate-400">Build Command</div>
+                      <div className="text-sm font-mono font-bold text-amber-400">npm install && npm run build</div>
+                      <div className="text-[11px] text-slate-400">Instala y compila el frontend</div>
+                    </div>
+                    <div className="p-4 bg-slate-950 rounded-xl border border-slate-800 space-y-1.5">
+                      <div className="text-xs font-bold text-slate-400">Start Command</div>
+                      <div className="text-sm font-mono font-bold text-emerald-400">npm start</div>
+                      <div className="text-[11px] text-slate-400">Inicia server.ts en producción</div>
+                    </div>
+                  </div>
+
+                  {/* Pasos Render */}
+                  <div className="p-5 bg-slate-950 rounded-2xl border border-slate-800 space-y-4">
+                    <h4 className="font-bold text-white text-sm flex items-center gap-2">
+                      <span className="w-6 h-6 rounded-full bg-indigo-500/20 text-indigo-400 text-xs flex items-center justify-center font-black">
+                        1
+                      </span>
+                      Pasos para levantar en Render (Web Service)
+                    </h4>
+
+                    <ol className="space-y-3 text-xs text-slate-300 list-decimal list-inside pl-2">
+                      <li className="leading-relaxed">
+                        <strong className="text-white">Crea una cuenta en Render:</strong> Ingresa a{' '}
+                        <a
+                          href="https://dashboard.render.com"
+                          target="_blank"
+                          rel="noreferrer"
+                          className="text-indigo-400 underline hover:text-indigo-300 inline-flex items-center gap-0.5"
+                        >
+                          dashboard.render.com <ExternalLink className="w-3 h-3" />
+                        </a>{' '}
+                        con tu cuenta de GitHub.
+                      </li>
+                      <li className="leading-relaxed">
+                        <strong className="text-white">Nuevo Servicio:</strong> Haz clic en <span className="bg-slate-800 text-white px-2 py-0.5 rounded font-bold">New + ➔ Web Service</span> y conecta tu repositorio.
+                      </li>
+                      <li className="leading-relaxed">
+                        <strong className="text-white">Configuración del Servicio:</strong>
+                        <div className="mt-2 pl-4 space-y-1 text-slate-300 font-mono text-[11px]">
+                          <div>• Runtime: <strong className="text-white">Node</strong></div>
+                          <div>• Build Command: <strong className="text-amber-400">npm install && npm run build</strong></div>
+                          <div>• Start Command: <strong className="text-emerald-400">npm start</strong></div>
+                          <div>• Plan: <strong className="text-white">Free</strong> ($0 / mes)</div>
+                        </div>
+                      </li>
+                      <li className="leading-relaxed">
+                        <strong className="text-white">Variables de Entorno (Environment Variables):</strong>
+                        <div className="mt-2 pl-4 space-y-1 text-slate-300 text-[11px]">
+                          <div>• <code className="bg-slate-900 px-1 py-0.5 rounded text-white">NODE_ENV</code> = <code className="text-emerald-400">production</code></div>
+                          <div>• <code className="bg-slate-900 px-1 py-0.5 rounded text-white">PORT</code> = <code className="text-cyan-400">10000</code></div>
+                          <div>• (Opcional) Variables de conexión MySQL (<code className="text-slate-400">MYSQL_HOST, MYSQL_USER, MYSQL_PASSWORD, MYSQL_DATABASE, MYSQL_SSL=true</code>).</div>
+                        </div>
+                      </li>
+                      <li className="leading-relaxed">
+                        <strong className="text-white">Haz clic en "Deploy Web Service":</strong> Render construirá el frontend y levantará el backend Node.js en vivo.
+                      </li>
+                    </ol>
+                  </div>
+
+                  {/* Configuración render.yaml incluida */}
+                  <div className="p-5 bg-slate-950 rounded-2xl border border-slate-800 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <Terminal className="w-4 h-4 text-indigo-400" />
+                        <span className="font-bold text-white text-xs">
+                          Blueprint render.yaml (Ya creado e incluido en el proyecto)
+                        </span>
+                      </div>
+                      <button
+                        onClick={() => {
+                          const yamlText = `services:
+  - type: web
+    name: dominus-gym-rifa
+    env: node
+    plan: free
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000`;
+                          navigator.clipboard.writeText(yamlText);
+                          setCopiedDeploySnippet('render_yaml');
+                          setTimeout(() => setCopiedDeploySnippet(null), 2000);
+                        }}
+                        className="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold rounded-lg flex items-center gap-1 cursor-pointer transition-colors"
+                      >
+                        {copiedDeploySnippet === 'render_yaml' ? (
+                          <>
+                            <Check className="w-3 h-3 text-emerald-400" />
+                            <span className="text-emerald-400">Copiado</span>
+                          </>
+                        ) : (
+                          <>
+                            <Copy className="w-3 h-3" />
+                            <span>Copiar YAML</span>
+                          </>
+                        )}
+                      </button>
+                    </div>
+
+                    <pre className="p-3 bg-slate-900 rounded-xl border border-slate-800/80 text-[11px] font-mono text-slate-300 overflow-x-auto">
+{`services:
+  - type: web
+    name: dominus-gym-rifa
+    env: node
+    plan: free
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000`}
+                    </pre>
+                    <p className="text-[11px] text-slate-400">
+                      💡 En Render también puedes seleccionar <strong>"New ➔ Blueprint"</strong> y Render leerá este archivo automáticamente sin configurar nada a mano.
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {/* Guía rápida de Git para subir a GitHub */}
+              <div className="p-4 bg-slate-900/60 rounded-xl border border-slate-800 space-y-2">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Terminal className="w-4 h-4 text-emerald-400" />
+                    <span className="text-xs font-bold text-white">
+                      Comandos para subir a GitHub por primera vez:
+                    </span>
+                  </div>
+                  <button
+                    onClick={() => {
+                      const gitCmds = `git init\ngit add .\ngit commit -m "DOMINUS GYM Rifa Oficial"\ngit branch -M main\ngit remote add origin https://github.com/TU_USUARIO/TU_REPOSITORIO.git\ngit push -u origin main`;
+                      navigator.clipboard.writeText(gitCmds);
+                      setCopiedDeploySnippet('git_cmds');
+                      setTimeout(() => setCopiedDeploySnippet(null), 2000);
+                    }}
+                    className="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold rounded-lg flex items-center gap-1 cursor-pointer transition-colors"
+                  >
+                    {copiedDeploySnippet === 'git_cmds' ? (
+                      <>
+                        <Check className="w-3 h-3 text-emerald-400" />
+                        <span className="text-emerald-400">Copiado</span>
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="w-3 h-3" />
+                        <span>Copiar comandos Git</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+                <pre className="p-2.5 bg-slate-950 rounded-lg text-[10px] font-mono text-emerald-300/90 overflow-x-auto">
+{`git init
+git add .
+git commit -m "DOMINUS GYM Rifa Oficial"
+git branch -M main
+git remote add origin https://github.com/TU_USUARIO/TU_REPOSITORIO.git
+git push -u origin main`}
+                </pre>
+              </div>
             </div>
           )}
         </div>
