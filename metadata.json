@@ -1,0 +1,6 @@
+{
+  "name": "DOMINUS GYM - Gran Rifa Oficial Fiat Mobi 2017",
+  "description": "Gran Rifa Oficial de DOMINUS GYM. Único premio: Fiat Mobi 2017 IMPECABLE 😍. Elegí tus números con descuentos hasta $2.500 c/u y pagá con Mercado Pago.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
